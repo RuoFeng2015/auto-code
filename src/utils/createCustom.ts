@@ -1,7 +1,7 @@
 export class CreateCustomFun {
   tableName: string
   isCheckToken: Boolean
-  constructor(tableName, isCheckToken) {
+  constructor(tableName: string, isCheckToken: Boolean) {
     this.tableName = tableName
     this.isCheckToken = isCheckToken
   }
@@ -45,7 +45,7 @@ export class CreateCustomFun {
     )
   }
   delete() {
-    const delSql = 'var delSql = "update ' + this.tableName + ' set isDelete = 1 where id=#{id}"'
+    const delSql = 'var delSql = "update ' + this.tableName + ' set deleteFlag = 1 where id=#{id}"'
     const emptyJudge = `
     if(!Params.id){
      return JsResult.result=createRes('0007','id不能为空')
@@ -73,9 +73,11 @@ export class CreateCustomFun {
     var limit = Params.limit ? Params.limit : 10
     var limitSize = (current - 1) * limit // 需要跳过的数据
     var timeStr=''
-    if (Params.startTime) {
-      timeStr = ' and createTime>= ' + Params.startTime + ' and createTime <= ' + Params.endTime
+    var timeObj = {
+      createTime: function () { return ' and createTime >= #{startTime}'},
+      endTime: function () { return ' and createTime >= #{endTime}'}
     }
+    timeStr=(Params.createTime?timeObj.createTime():'')+(Params.endTime?timeObj.endTime():'')
     `
     // 查询总条数
     let queryTotalSql =
@@ -300,8 +302,8 @@ export class CreateCustomFun {
       return JsResult.result=createRes('00012','本月已领取过奖')
     }
     //生成中奖奖品
-    var querySql = 'select * from '+prizeConfigTableName+ ' where activityId = ' + Params.activityId
-    var queryPrizeRes = CustomizeUtil.abilitySql(querySql);
+    var querySql = 'select * from '+prizeConfigTableName+ ' where activityId = #{activityId}'
+    var queryPrizeRes = CustomizeUtil.abilitySql(querySql,Params);
     var pres = JSON.parse(queryPrizeRes).data.results
     //中奖数据
     var prizeData = []

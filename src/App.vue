@@ -84,7 +84,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, reactive, toRefs, computed, toRaw } from 'vue'
+import { defineComponent, ref, reactive, toRefs, computed, toRaw ,toRaw} from 'vue'
 
 import { ImpExcel, ExcelData } from './components/Excel'
 import type { UnwrapRef } from 'vue'
@@ -101,18 +101,12 @@ export default defineComponent({
 
   setup() {
     let state: any = reactive({
-       modelPath: [
-        {
-          order: 1,
-          path: "/live2d/tororo/tororo.model.json",
-        }
-      ],
       mode: 'add',
       code: '',
       isCheckToken: true,
       tableName: '',
       tableKey: [],
-      commonKey: ['status', 'createTime', 'updateTime', 'isDelete', 'reserved1', 'reserved2'],
+      commonKey: ['status', 'createTime', 'updateTime', 'deleteFlag', 'reserved1', 'reserved2'],
       dataSource: [],
       columns: []
     })
@@ -164,14 +158,14 @@ export default defineComponent({
       console.log('%c 🦀 arr: ', 'font-size:20px;background-color: #E41A6A;color:#fff;', arr)
       let reateCustomFun = new CreateCustomFun(state.tableName, state.isCheckToken)
       state.code = reateCustomFun[state.mode](...arr)
-      if (!state.tableKey.includes('status')) {
+      let tableArr:any=[]
+      state.tableKey.map((item:any)=>{
+        tableArr.push(item.value)
+      })
+      if (!tableArr.includes('status')) {
+        console.log('不存在status')
         state.code = state.code.replace(/status = 1/g, '1 = 1')
       }
-      console.log(
-        '%c 🥑 state.code: ',
-        'font-size:20px;background-color: #33A5FF;color:#fff;',
-        state.code
-      )
     }
     const onSuccess = () => {
       message.success('复制成功')
