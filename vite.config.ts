@@ -8,13 +8,13 @@ export default defineConfig({
     // brotliSize: false, //关闭打包计算
     outDir: './docs',
     assetsDir: './',
-    rollupOptions: {
-      output: {
-        chunkFileNames: 'static/js/[name]-[hash].js',
-        entryFileNames: 'static/js/[name]-[hash].js',
-        assetFileNames: 'static/[ext]/[name]-[hash].[ext]'
-      }
-    },
+    // rollupOptions: {
+    //   output: {
+    //     chunkFileNames: 'static/js/[name]-[hash].js',
+    //     entryFileNames: 'static/js/[name]-[hash].js',
+    //     assetFileNames: 'static/[ext]/[name]-[hash].[ext]'
+    //   }
+    // },
     terserOptions: {
       compress: {
         keep_infinity: true
