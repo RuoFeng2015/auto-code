@@ -4,6 +4,7 @@ import vue from '@vitejs/plugin-vue'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [vue()],
+  base: './',
   build: {
     // brotliSize: false, //关闭打包计算
     outDir: './docs',
