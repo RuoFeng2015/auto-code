@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [vue()],
   build: {
     // brotliSize: false, //关闭打包计算
-    outDir: '../docs',
+    outDir: './docs',
     assetsDir: './',
     rollupOptions: {
       output: {
