@@ -168,6 +168,39 @@ export class CreateCustomFun {
       this.commonFooter()
     )
   }
+  importData(importArr: any) {
+    let importSql = 'var sql = "insert into ' + this.tableName + ' ('
+    importArr.map((item: any, index: number) => {
+      importSql += (index != 0 ? ',' : '') + item
+    })
+    importSql += ') values "'
+    let mainStr = `
+    var tempArr='${importArr}';
+    var importArr=tempArr.split(",");
+    var dataArr = JSON.parse(Params.content)
+    for (var i = 0; i < dataArr.length; i++) {
+      var item = dataArr[i]
+      var str = "("
+      for (var j = 0; j < importArr.length; j++) {
+        str += item[importArr[j]] + (j < importArr.length - 1 ? "," : "");
+      }
+      sql += str + ")" + (i < dataArr.length - 1 ? "," : "");
+    }
+    var create = CustomizeUtil.abilitySql(sql);
+    JsResult.result = create;
+    `
+    return (
+      this.commonHead() +
+      (this.isCheckToken ? this.checkToken() : '') +
+      '\n' +
+      importSql +
+      '\n' +
+      mainStr +
+      '\n' +
+      this.commonFooter()
+    )
+
+  }
   checkToken() {
     return `
     try {
@@ -263,24 +296,29 @@ export class CreateCustomFun {
     userphone: phone
   }
   // 校验短信验证码
-  var vacodeResult = CustomizeUtil.acquireValidCode(phone, smsCode, '')
-  var jsonVacodeResult = JSON.parse(vacodeResult)
-  var rettoken = null
-  if (!jsonVacodeResult.hasOwnProperty('data')) {
-    JsResult.result = createRes('00004', '您输入的验证码有误，请重新输入')
-    return
-  } else {
-    rettoken = jsonVacodeResult.data.token
-    userInfo.token = rettoken
-    var tokenparams = { key: rettoken, value: userInfo, overTime: 3 * 24 * 60 * 60 }
-    var tokenresult = CustomizeUtil.redisSet(tokenparams) //设置缓存
-    var jsonTokenResult = JSON.parse(tokenresult)
-    if (jsonTokenResult.data.status == '0') {
-      JsResult.result = JSON.stringify(userInfo)
+  try {
+    var vacodeResult = CustomizeUtil.acquireValidCode(phone, smsCode, '')
+    var jsonVacodeResult = JSON.parse(vacodeResult)
+    var rettoken = null
+    if (!jsonVacodeResult.hasOwnProperty('data')) {
+      JsResult.result = createRes('00004', '您输入的验证码有误，请重新输入')
+      return
     } else {
-      JsResult.result = tokenresult
+      rettoken = jsonVacodeResult.data.token
+      userInfo.token = rettoken
+      var tokenparams = { key: rettoken, value: userInfo, overTime: 3 * 24 * 60 * 60 }
+      var tokenresult = CustomizeUtil.redisSet(tokenparams) //设置缓存
+      var jsonTokenResult = JSON.parse(tokenresult)
+      if (jsonTokenResult.data.status == '0') {
+        JsResult.result = JSON.stringify(userInfo)
+      } else {
+        JsResult.result = tokenresult
+      }
     }
+  } catch (error) {
+    JsResult.result = createRes('99999', '系统异常，请稍后再试!')
   }
+
     `
     return this.commonHead() + '\n' + loginStr + '\n' + this.commonFooter()
   }

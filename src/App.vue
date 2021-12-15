@@ -1,90 +1,89 @@
 <template>
-  <div class='app-page'>
-      <a-card title="Auto code" :bordered="false" style="width: 1200px">
-        <div class="tags" style="margin: 20px 6px">
-      <span>数据库公共字段：</span>
-      <a-tag
-        v-for="(item, index) in commonKey"
-        :key="item"
-        v-clipboard="item"
-        v-clipboard:success="onSuccess"
-        v-clipboard:error="onError"
-        style="margin: 0 6px 0 5px"
-        color="#108ee9"
-        >{{ item }}</a-tag
-      >
-    </div>
-    <ImpExcel dateFormat="YYYY-MM-DD" @success="loadDataSuccess">
-      <a-button class="m-3">导入字段</a-button>
-    </ImpExcel>
+  <div class="app-page">
+    <a-card title="Auto code" :bordered="false" style="width: 1200px">
+      <div class="tags" style="margin: 20px 6px">
+        <span>数据库公共字段：</span>
+        <a-tag
+          v-for="(item, index) in commonKey"
+          :key="item"
+          v-clipboard="item"
+          v-clipboard:success="onSuccess"
+          v-clipboard:error="onError"
+          style="margin: 0 6px 0 5px"
+          color="#108ee9"
+        >{{ item }}</a-tag>
+      </div>
+      <ImpExcel dateFormat="YYYY-MM-DD" @success="loadDataSuccess">
+        <a-button class="m-3">导入字段</a-button>
+      </ImpExcel>
 
-    <div class="tags" style="margin: 20px 6px">
-      <a-tag
-        v-for="(item, index) in tableKey"
-        :key="item.value"
-        v-clipboard="item.value"
-        v-clipboard:success="onSuccess"
-        v-clipboard:error="onError"
-        style="margin: 0 6px 0 5px"
-        color="#108ee9"
-        >{{ item.value }}</a-tag
-      >
-    </div>
-    <a-form :labelCol="{ span: 4, offset: 0 }">
-      <a-form-item label="是否校验token">
-        <a-switch v-model:checked="isCheckToken" checked-children="是" un-checked-children="否" />
-      </a-form-item>
-      <a-form-item label="sql">
-        <a-radio-group v-model:value="mode">
-          <a-radio-button value="add">增</a-radio-button>
-          <a-radio-button value="delete">删</a-radio-button>
-          <a-radio-button value="update">改</a-radio-button>
-          <a-radio-button value="select">查</a-radio-button>
-          <a-radio-button value="backLogin">后台登录</a-radio-button>
-          <a-radio-button value="frontLogin">前台验证码登录</a-radio-button>
-          <a-radio-button value="onkeyLogin">一键登录</a-radio-button>
-          <a-radio-button value="luckyDraw">抽奖</a-radio-button>
-        </a-radio-group>
-      </a-form-item>
-      <a-form-item v-if="mode !== 'luckyDraw'" label="关联表名">
-        <a-input v-model:value="tableName" placeholder="请输入表名" />
-      </a-form-item>
+      <div class="tags" style="margin: 20px 6px">
+        <a-tag
+          v-for="(item, index) in tableKey"
+          :key="item.value"
+          v-clipboard="item.value"
+          v-clipboard:success="onSuccess"
+          v-clipboard:error="onError"
+          style="margin: 0 6px 0 5px"
+          color="#108ee9"
+        >{{ item.value }}</a-tag>
+      </div>
+      <a-form :labelCol="{ span: 4, offset: 0 }">
+        <a-form-item label="是否校验token">
+          <a-switch v-model:checked="isCheckToken" checked-children="是" un-checked-children="否" />
+        </a-form-item>
+        <a-form-item label="sql">
+          <a-radio-group v-model:value="mode">
+            <a-radio-button value="add">增</a-radio-button>
+            <a-radio-button value="delete">删</a-radio-button>
+            <a-radio-button value="update">改</a-radio-button>
+            <a-radio-button value="select">查</a-radio-button>
+            <a-radio-button value="importData">导入数据</a-radio-button>
+            <a-radio-button value="backLogin">后台登录</a-radio-button>
+            <a-radio-button value="frontLogin">前台验证码登录</a-radio-button>
+            <a-radio-button value="onkeyLogin">一键登录</a-radio-button>
+            <a-radio-button value="luckyDraw">抽奖</a-radio-button>
+          </a-radio-group>
+        </a-form-item>
+        <a-form-item v-if="mode !== 'luckyDraw'" label="关联表名">
+          <a-input v-model:value="tableName" placeholder="请输入表名" />
+        </a-form-item>
 
-      <a-form-item v-for="(item, index) in configState[mode]" :key="index" :label="item.label">
-        <a-select
-          v-if="item.component === 'select'"
-          v-model:value="item.value"
-          mode="tags"
-          style="width: 100%"
-          placeholder="Tags Mode"
-          :options="tableKey"
-          @change="handleChange"
+        <a-form-item v-for="(item, index) in configState[mode]" :key="index" :label="item.label">
+          <a-select
+            v-if="item.component === 'select'"
+            v-model:value="item.value"
+            mode="tags"
+            style="width: 100%"
+            placeholder="Tags Mode"
+            :options="tableKey"
+            @change="handleChange"
+          />
+          <a-input
+            v-if="item.component === 'input'"
+            v-model:value="item.value"
+            placeholder="请输入表名"
+          />
+        </a-form-item>
+        <a-form-item style="text-align: center">
+          <a-button type="primary" @click="handleCreateCode">生成代码</a-button>
+        </a-form-item>
+      </a-form>
+      <div class="code">
+        <CopyOutlined
+          v-clipboard="code"
+          v-clipboard:success="onSuccess"
+          v-clipboard:error="onError"
+          :style="{ fontSize: '20px', color: '#fff' }"
         />
-        <a-input
-          v-if="item.component === 'input'"
-          v-model:value="item.value"
-          placeholder="请输入表名"
-        />
-      </a-form-item>
-      <a-form-item style="text-align: center">
-        <a-button type="primary" @click="handleCreateCode">生成代码</a-button>
-      </a-form-item>
-    </a-form>
-    <div class="code">
-      <CopyOutlined
-        v-clipboard="code"
-        v-clipboard:success="onSuccess"
-        v-clipboard:error="onError"
-        :style="{ fontSize: '20px', color: '#fff' }"
-      />
-      <pre v-if="code" v-highlightjs><code class="go">{{ code }}</code></pre>
-    </div>
+        <pre v-if="code" v-highlightjs><code class="go">{{ code }}</code></pre>
+      </div>
     </a-card>
- <!-- <vue-live2d :modelPath="modelPath"></vue-live2d> -->
+    <!-- <vue-live2d :modelPath="modelPath"></vue-live2d> -->
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, reactive, toRefs, computed, toRaw ,toRaw} from 'vue'
+import { defineComponent, ref, reactive, toRefs, computed, toRaw, toRaw } from 'vue'
 
 import { ImpExcel, ExcelData } from './components/Excel'
 import type { UnwrapRef } from 'vue'
@@ -129,6 +128,7 @@ export default defineComponent({
         { label: '精准查询字段', value: [], key: 'accurateArr', component: 'select' },
         { label: '模糊查询字段', value: [], key: 'dimArr', component: 'select' }
       ],
+      importData: [{ label: '导入的字段', value: [], key: 'importArr', component: 'select' },],
       backLogin: [],
       frontLogin: [],
       onkeyLogin: [],
@@ -152,14 +152,14 @@ export default defineComponent({
       localStorage.setItem('configState', JSON.stringify(configState))
       let arr: any = []
       let configData = configState[state.mode]
-      configData.forEach((item:any) => {
+      configData.forEach((item: any) => {
         arr.push(toRaw(item.value))
       })
       console.log('%c 🦀 arr: ', 'font-size:20px;background-color: #E41A6A;color:#fff;', arr)
       let reateCustomFun = new CreateCustomFun(state.tableName, state.isCheckToken)
       state.code = reateCustomFun[state.mode](...arr)
-      let tableArr:any=[]
-      state.tableKey.map((item:any)=>{
+      let tableArr: any = []
+      state.tableKey.map((item: any) => {
         tableArr.push(item.value)
       })
       if (!tableArr.includes('status')) {
@@ -191,7 +191,7 @@ export default defineComponent({
         state.tableKey.push({ value: item.trim() })
         if (
           state.mode === 'add' &&
-          !['id', 'status', 'updateTime', 'isDelete'].includes(item.trim())
+          !['id', 'status', 'updateTime', 'deleteFlag'].includes(item.trim())
         ) {
           configState.add[0].value.push(item.trim())
         }
@@ -234,11 +234,9 @@ export default defineComponent({
 })
 </script>
 <style >
-
-.app-page{
+.app-page {
   max-width: 1200px;
   margin: 20px auto;
-
 }
 .ant-tag {
   cursor: pointer;
@@ -246,18 +244,14 @@ export default defineComponent({
 
 .code {
   position: relative;
-
- 
-
-
 }
-  code {
-    min-height: 50px;
-  }
- .anticon-copy {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    cursor: pointer;
-  }
+code {
+  min-height: 50px;
+}
+.anticon-copy {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  cursor: pointer;
+}
 </style>
