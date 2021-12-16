@@ -177,7 +177,7 @@ export class CreateCustomFun {
     let mainStr = `
     var tempArr='${importArr}';
     var importArr=tempArr.split(",");
-    var dataArr = JSON.parse(Params.content)
+    var dataArr = Params.content
     for (var i = 0; i < dataArr.length; i++) {
       var item = dataArr[i]
       var str = "("
