@@ -5,7 +5,7 @@ export class CreateCustomFun {
     this.tableName = tableName
     this.isCheckToken = isCheckToken
   }
-  add(addArr, noEmptyArr) {
+  add(addArr: any[], noEmptyArr: any[]) {
     console.log(
       '%c 🍶 noEmptyArr: ',
       'font-size:20px;background-color: #42b983;color:#fff;',
@@ -67,7 +67,7 @@ export class CreateCustomFun {
       this.commonFooter()
     )
   }
-  select(accurateArr, dimArr, areaTime) {
+  select(accurateArr: any[], dimArr: any[]) {
     const pageStr = `
     var current = Params.current ? Params.current : 1
     var limit = Params.limit ? Params.limit : 10
@@ -85,10 +85,10 @@ export class CreateCustomFun {
     // 查询数据
     let queryDataSql = 'var queryDataSql= "select * from ' + this.tableName + ' where status = 1"'
     let commonSql = ''
-    accurateArr.map((item) => {
+    accurateArr.map((item: any) => {
       commonSql += `+(Params['${item}']?" and ${item} = #{${item}}":"")`
     })
-    dimArr.map((item) => {
+    dimArr.map((item: any) => {
       commonSql += `+(Params['${item}']?(" and ${item} like '%"+Params['${item}']+"%'"):"")`
       // commonSql += `+(Params['${item}']?(" and ${item} like '%"+#{${item}}+"%'"):"")`
       // commonSql += `+" and ${item} like '%#{${item}}%'"`
@@ -133,7 +133,7 @@ export class CreateCustomFun {
       this.commonFooter()
     )
   }
-  update(updateArr, noEmptyArr, conditionArr) {
+  update(updateArr: any[], noEmptyArr: any[], conditionArr: any[]) {
     let updateSql = 'var updateSql = "update ' + this.tableName + ' set '
     const emptyJudge = `
     var nArr= ${JSON.stringify(noEmptyArr)}\n
@@ -169,7 +169,7 @@ export class CreateCustomFun {
     )
   }
   importData(importArr: any) {
-    let importSql = 'var sql = "insert into ' + this.tableName + ' ('
+    let importSql = '     var sql = "insert into ' + this.tableName + ' ('
     importArr.map((item: any, index: number) => {
       importSql += (index != 0 ? ',' : '') + item
     })
@@ -182,7 +182,7 @@ export class CreateCustomFun {
       var item = dataArr[i]
       var str = "("
       for (var j = 0; j < importArr.length; j++) {
-        str += item[importArr[j]] + (j < importArr.length - 1 ? "," : "");
+        str +="'"+ item[importArr[j]]+"'"+ (j < importArr.length - 1 ? "," : "");
       }
       sql += str + ")" + (i < dataArr.length - 1 ? "," : "");
     }
@@ -330,7 +330,7 @@ export class CreateCustomFun {
    *
    */
   //抽奖
-  luckyDraw(prizeResultTableName, prizeConfigTableName, prArr, pcArr) {
+  luckyDraw(prizeResultTableName: string, prizeConfigTableName: string, prArr: any[], pcArr: any[]) {
     const pn = `var prizeResultTableName = "${prizeResultTableName}"//奖品记录表\nvar prizeConfigTableName= "${prizeConfigTableName}" //奖品配置表 `
     const drawContent = `//一个月只能中一次奖
     var queryCount = "select count(*) as number from "+prizeResultTableName+" where userPhone ='" + Params.userPhone + "'and busResult = 1 and createTime between '" + Params.startTime + "' and '" + Params.endTime + "'"

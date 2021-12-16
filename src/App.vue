@@ -27,6 +27,12 @@
           style="margin: 0 6px 0 5px"
           color="#108ee9"
         >{{ item.value }}</a-tag>
+        <a-tag color="#f50" @click="handleCheckAll">
+          <template #icon>
+            <twitter-outlined />
+          </template>
+          一键全选
+        </a-tag>
       </div>
       <a-form :labelCol="{ span: 4, offset: 0 }">
         <a-form-item label="是否校验token">
@@ -90,13 +96,19 @@ import type { UnwrapRef } from 'vue'
 import { CopyOutlined } from '@ant-design/icons-vue'
 import { CreateCustomFun } from '@/utils/createCustom'
 import { message } from 'ant-design-vue'
+import {
+  TwitterOutlined,
+  YoutubeOutlined,
+  FacebookOutlined,
+  LinkedinOutlined,
+} from '@ant-design/icons-vue';
 interface FormState {
   layout: 'horizontal' | 'vertical' | 'inline'
   fieldA: string
   fieldB: string
 }
 export default defineComponent({
-  components: { ImpExcel, CopyOutlined },
+  components: { ImpExcel, CopyOutlined, TwitterOutlined, },
 
   setup() {
     let state: any = reactive({
@@ -174,6 +186,13 @@ export default defineComponent({
     const onError = () => {
       message.error('复制失败')
     }
+    const handleCheckAll = () => {
+      if (!(configState[state.mode][0].value instanceof Array)) return
+      configState[state.mode][0].value = []
+      state.tableKey.map((item: any) => {
+        configState[state.mode][0].value.push(item.value)
+      })
+    }
     function loadDataSuccess(excelDataList: ExcelData[]) {
       console.log(
         '%c 🍝 excelDataList: ',
@@ -187,14 +206,18 @@ export default defineComponent({
       const { header, results } = excelDataList[0]
       state.tableKey = []
       configState.add[0].value = []
+      configState.importData[0].value = []
       header.map((item) => {
+
         state.tableKey.push({ value: item.trim() })
         if (
           state.mode === 'add' &&
           !['id', 'status', 'updateTime', 'deleteFlag'].includes(item.trim())
         ) {
           configState.add[0].value.push(item.trim())
+
         }
+        configState.importData[0].value.push(item.trim())
       })
       state.columns = []
 
@@ -220,6 +243,7 @@ export default defineComponent({
     }
 
     return {
+      handleCheckAll,
       onSuccess,
       onError,
       handleCopy,
