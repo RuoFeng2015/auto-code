@@ -182,7 +182,8 @@ export class CreateCustomFun {
       var item = dataArr[i]
       var str = "("
       for (var j = 0; j < importArr.length; j++) {
-        str +="'"+ item[importArr[j]]+"'"+ (j < importArr.length - 1 ? "," : "");
+        var itemVal=item[importArr[j]]||''
+        str +="'"+itemVal+"'"+ (j < importArr.length - 1 ? "," : "");
       }
       sql += str + ")" + (i < dataArr.length - 1 ? "," : "");
     }
