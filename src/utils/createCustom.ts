@@ -1,9 +1,111 @@
 export class CreateCustomFun {
   tableName: string
   isCheckToken: Boolean
-  constructor(tableName: string, isCheckToken: Boolean) {
-    this.tableName = tableName
-    this.isCheckToken = isCheckToken
+  isGetNowTime: Boolean
+  isGetMonTime: Boolean
+  isGetDayTime: Boolean
+  constructor(state: any) {
+    this.tableName = state.tableName
+    this.isCheckToken = state.isCheckToken
+    this.isGetNowTime = state.isGetNowTime
+    this.isGetMonTime = state.isGetMonTime
+    this.isGetDayTime = state.isGetDayTime
+  }
+  handleTime() {
+    let configMap = {
+      isGetNowTime: () => this.getNowTime(),
+      isGetDayTime: () => this.getTodayStartTimeAndEndTime(),
+      isGetMonTime: () => this.getMonthStartTimeAndEndTime(),
+    }
+    let str = ''
+    Object.keys(configMap).map((item: String) => {
+      if (this[item]) {
+        str += configMap[item]() + '\n'
+      }
+    })
+    return str
+  }
+  getNowTime() {
+    return `
+    //获取当前时间
+    function getNowTime() {
+      function add0(m) { return m < 10 ? '0' + m : m }
+      function format() {
+        var time = new Date();
+        var y = time.getFullYear();
+        var m = time.getMonth() + 1;
+        var d = time.getDate();
+        var h = time.getHours();
+        var mm = time.getMinutes();
+        var s = time.getSeconds();
+        return y + '-' + add0(m) + '-' + add0(d) + ' ' + add0(h) + ':' + add0(mm) + ':' + add0(s);
+      }
+      return format()
+    }
+    Params.createTime = getNowTime()
+    `
+  }
+  getTodayStartTimeAndEndTime() {
+    return `
+    //获取今天开始时间和结束时间
+    function getTodayStartTimeAndEndTime(time) {
+      var time = time ? time : new Date();
+      function add0(m) { return m < 10 ? '0' + m : m }
+      function format(t) {
+        //shijianchuo是整数，否则要parseInt转换
+        var time = new Date(t);
+        var y = time.getFullYear();
+        var m = time.getMonth() + 1;
+        var d = time.getDate();
+        var h = time.getHours();
+        var mm = time.getMinutes();
+        var s = time.getSeconds();
+        return y + '-' + add0(m) + '-' + add0(d) + ' ' + add0(h) + ':' + add0(mm) + ':' + add0(s);
+      }
+      return [
+        format(time.setHours(0, 0, 0, 0)),
+        format(time.setHours(23, 59, 59, 999)),
+      ]
+  
+    }
+    var tiemArr = getTodayStartTimeAndEndTime()
+    Params.startT = tiemArr[0]
+    Params.endT = tiemArr[1]
+    `
+  }
+  getMonthStartTimeAndEndTime() {
+    return `
+    //获取本月开始时间和结束时间
+    function getMonthStartTimeAndEndTime() {
+      var date = new Date()
+      var currentMonth = date.getMonth()
+      date.setDate(1)
+      var month = date.getMonth() + 1
+      var day = date.getDate()
+      if (month < 10) {
+        month = '0' + month
+      }
+      if (day < 10) {
+        day = '0' + day
+      }
+      var nextMonth = ++currentMonth
+      var nextMonthFirstDay = new Date(date.getFullYear(), nextMonth, 1)
+      var oneDay = 1000 * 60 * 60 * 24
+      var lastTime = new Date(nextMonthFirstDay - oneDay)
+      var endMonth = lastTime.getMonth() + 1
+      var endDay = lastTime.getDate()
+      if (endMonth < 10) {
+        endMonth = '0' + endMonth
+      }
+      if (endDay < 10) {
+        endDay = '0' + endDay
+      }
+      return [date.getFullYear() + '-' + month + '-' + day, date.getFullYear() + '-' + endMonth + '-' + endDay]
+    }
+    var tiemArr = getMonthStartTimeAndEndTime()
+    Params.startT = tiemArr[0]
+    Params.endT = tiemArr[1]
+    `
   }
   add(addArr: any[], noEmptyArr: any[]) {
     console.log(
@@ -36,6 +138,7 @@ export class CreateCustomFun {
       `var orgResult = CustomizeUtil.abilitySql(addSql, Params)
     JsResult.result = orgResult`
     return (
+      this.handleTime() +
       this.commonHead() +
       (this.isCheckToken ? this.checkToken() : '') +
       '\n' +
@@ -58,7 +161,9 @@ export class CreateCustomFun {
       '\n' +
       `var orgResult = CustomizeUtil.abilitySql(delSql, Params)
     JsResult.result = orgResult`
+
     return (
+      this.handleTime() +
       this.commonHead() +
       (this.isCheckToken ? this.checkToken() : '') +
       '\n' +
@@ -75,7 +180,7 @@ export class CreateCustomFun {
     var timeStr=''
     var timeObj = {
       createTime: function () { return ' and createTime >= #{startTime}'},
-      endTime: function () { return ' and createTime >= #{endTime}'}
+      endTime: function () { return ' and createTime =< #{endTime}'}
     }
     timeStr=(Params.createTime?timeObj.createTime():'')+(Params.endTime?timeObj.endTime():'')
     `
@@ -108,6 +213,7 @@ export class CreateCustomFun {
     var queryDataRes = JSON.parse(queryResult)
     `
     return (
+      this.handleTime() +
       this.commonHead() +
       '\n' +
       pageStr +
@@ -160,6 +266,7 @@ export class CreateCustomFun {
       `var orgResult = CustomizeUtil.abilitySql(updateSql, Params)
     JsResult.result = orgResult`
     return (
+      this.handleTime() +
       this.commonHead() +
       (this.isCheckToken ? this.checkToken() : '') +
       '\n' +
@@ -182,7 +289,7 @@ export class CreateCustomFun {
       var item = dataArr[i]
       var str = "("
       for (var j = 0; j < importArr.length; j++) {
-        var itemVal=item[importArr[j]]||''
+        var itemVal=item[importArr[j]]===0?0:(item[importArr[j]]||'')
         str +="'"+itemVal+"'"+ (j < importArr.length - 1 ? "," : "");
       }
       sql += str + ")" + (i < dataArr.length - 1 ? "," : "");
@@ -191,6 +298,7 @@ export class CreateCustomFun {
     JsResult.result = create;
     `
     return (
+      this.handleTime() +
       this.commonHead() +
       (this.isCheckToken ? this.checkToken() : '') +
       '\n' +
@@ -210,6 +318,7 @@ export class CreateCustomFun {
         JsResult.result = createRes('00008', 'token过期或token不能为空')
         return
       }
+      Params.phone = JSON.parse(redisRes.data.value).userphone
     } catch (error) {
       return JsResult.result = createRes('00008', 'token过期或token不能为空')
     }
@@ -229,7 +338,7 @@ export class CreateCustomFun {
       var mres = CustomizeUtil.getMobile(token);
       var mResponse=JSON.parse(mres)
       userInfo.token = token
-      userInfo.phone = mResponse.mobile
+      userInfo.userphone = mResponse.mobile
       var tokenparams = { key: token, value: userInfo, overTime: 3 * 24 * 60 * 60 }
       var tokenresult = CustomizeUtil.redisSet(tokenparams) //设置缓存
       var jsonTokenResult = JSON.parse(tokenresult)
@@ -239,7 +348,7 @@ export class CreateCustomFun {
         JsResult.result = tokenresult
       }
     `
-    return this.commonHead() + '\n' + loginStr + '\n' + this.commonFooter()
+    return this.handleTime() + this.commonHead() + '\n' + loginStr + '\n' + this.commonFooter()
   }
   backLogin() {
     const loginStr = `
@@ -283,7 +392,7 @@ export class CreateCustomFun {
       return
     }
     `
-    return this.commonHead() + '\n' + loginStr + '\n' + this.commonFooter()
+    return this.handleTime() + this.commonHead() + '\n' + loginStr + '\n' + this.commonFooter()
   }
   frontLogin() {
     const loginStr = `
@@ -321,7 +430,7 @@ export class CreateCustomFun {
   }
 
     `
-    return this.commonHead() + '\n' + loginStr + '\n' + this.commonFooter()
+    return this.handleTime() + this.commonHead() + '\n' + loginStr + '\n' + this.commonFooter()
   }
   /**
    * @param {String} prizeResultTableName 奖品记录表
@@ -412,6 +521,7 @@ export class CreateCustomFun {
       }
     `
     return (
+      this.handleTime() +
       pn +
       '\n' +
       this.commonHead() +

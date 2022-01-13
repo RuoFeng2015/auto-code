@@ -1,4 +1,4 @@
-.app-page{max-width:1200px;margin:20px auto}.ant-tag{cursor:pointer}.code{position:relative}code{min-height:50px}.anticon-copy{position:absolute;top:15px;right:20px;cursor:pointer}/*!
+.app-page{max-width:1200px;margin:20px auto}.raido{width:100%;display:flex;justify-content:flex-start;flex-wrap:wrap;margin-left:180px}.raido>div{width:40%}.raido .ant-form-item-control-input-content{display:flex;align-items:center}.raido .ant-form-item-control-input-content span{margin-left:10px}.ant-tag{cursor:pointer}.code{position:relative}code{min-height:50px}.anticon-copy{position:absolute;top:15px;right:20px;cursor:pointer}/*!
  * 
  * ant-design-vue v3.0.0-alpha.14
  *

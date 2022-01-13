@@ -34,10 +34,23 @@
           一键全选
         </a-tag>
       </div>
+      <a-from>
+        <div class="raido">
+          <a-form-item label="">
+            <a-switch v-model:checked="isCheckToken" checked-children="是" un-checked-children="否" /><span>是否校验token</span> 
+          </a-form-item>
+          <a-form-item label="">
+            <a-switch v-model:checked="isGetNowTime" checked-children="是" un-checked-children="否" /><span>是否获取当前时间</span> 
+          </a-form-item>
+          <a-form-item label="">
+            <a-switch v-model:checked="isGetMonTime" checked-children="是" un-checked-children="否" /><span>是否获取本月开始和结束时间</span> 
+          </a-form-item>
+          <a-form-item label="">
+            <a-switch v-model:checked="isGetDayTime" checked-children="是" un-checked-children="否" /><span>是否获取今天开始和结束时间</span> 
+          </a-form-item>
+        </div>
+      </a-from>
       <a-form :labelCol="{ span: 4, offset: 0 }">
-        <a-form-item label="是否校验token">
-          <a-switch v-model:checked="isCheckToken" checked-children="是" un-checked-children="否" />
-        </a-form-item>
         <a-form-item label="sql">
           <a-radio-group v-model:value="mode">
             <a-radio-button value="add">增</a-radio-button>
@@ -115,6 +128,9 @@ export default defineComponent({
       mode: 'add',
       code: '',
       isCheckToken: true,
+      isGetNowTime:true,
+      isGetMonTime:true,
+      isGetDayTime:true,
       tableName: '',
       tableKey: [],
       commonKey: ['status', 'createTime', 'updateTime', 'deleteFlag', 'reserved1', 'reserved2'],
@@ -168,7 +184,7 @@ export default defineComponent({
         arr.push(toRaw(item.value))
       })
       console.log('%c 🦀 arr: ', 'font-size:20px;background-color: #E41A6A;color:#fff;', arr)
-      let reateCustomFun = new CreateCustomFun(state.tableName, state.isCheckToken)
+      let reateCustomFun = new CreateCustomFun(state)
       state.code = reateCustomFun[state.mode](...arr)
       let tableArr: any = []
       state.tableKey.map((item: any) => {
@@ -261,6 +277,24 @@ export default defineComponent({
 .app-page {
   max-width: 1200px;
   margin: 20px auto;
+}
+.raido {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  margin-left: 180px;
+}
+.raido > div {
+  width: 40%;
+}
+.raido .ant-form-item-control-input-content {
+  display: flex;
+  align-items: center;
+  
+}
+.raido .ant-form-item-control-input-content span{
+    margin-left: 10px;
 }
 .ant-tag {
   cursor: pointer;
