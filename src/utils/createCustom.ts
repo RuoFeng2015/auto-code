@@ -184,7 +184,7 @@ export class CreateCustomFun {
     var timeStr=''
     var timeObj = {
       startTime: function () { return ' and createTime >= #{startTime}'},
-      endTime: function () { return ' and createTime =< #{endTime}'}
+      endTime: function () { return ' and createTime <= #{endTime}'}
     }
     timeStr=(Params.startTime?timeObj.createTime():'')+(Params.endTime?timeObj.endTime():'')
     `
