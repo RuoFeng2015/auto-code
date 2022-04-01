@@ -40,6 +40,9 @@
             <a-switch v-model:checked="isCheckToken" checked-children="是" un-checked-children="否" /><span>是否校验token</span> 
           </a-form-item>
           <a-form-item label="">
+            <a-switch v-model:checked="isBackground" checked-children="是" un-checked-children="否" /><span>是否后台接口</span> 
+          </a-form-item>
+          <a-form-item label="">
             <a-switch v-model:checked="isGetNowTime" checked-children="是" un-checked-children="否" /><span>是否获取当前时间</span> 
           </a-form-item>
           <a-form-item label="">
@@ -129,9 +132,11 @@ export default defineComponent({
       code: '',
       isCheckToken: true,
       isGetNowTime:true,
+      isBackground:true,
       isGetMonTime:false,
       isGetDayTime:false,
       tableName: '',
+      adminTable:'',
       tableKey: [],
       commonKey: ['status', 'createTime', 'updateTime', 'deleteFlag', 'reserved1', 'reserved2'],
       dataSource: [],

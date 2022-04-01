@@ -1,12 +1,16 @@
 export class CreateCustomFun {
   tableName: string
+  // mode: string
   isCheckToken: Boolean
   isGetNowTime: Boolean
+  isBackground: Boolean
   isGetMonTime: Boolean
   isGetDayTime: Boolean
   constructor(state: any) {
     this.tableName = state.tableName
+    // this.mode = state.mode
     this.isCheckToken = state.isCheckToken
+    this.isBackground = state.isBackground
     this.isGetNowTime = state.isGetNowTime
     this.isGetMonTime = state.isGetMonTime
     this.isGetDayTime = state.isGetDayTime
@@ -179,10 +183,10 @@ export class CreateCustomFun {
     var limitSize = (current - 1) * limit // 需要跳过的数据
     var timeStr=''
     var timeObj = {
-      createTime: function () { return ' and createTime >= #{startTime}'},
+      startTime: function () { return ' and createTime >= #{startTime}'},
       endTime: function () { return ' and createTime =< #{endTime}'}
     }
-    timeStr=(Params.createTime?timeObj.createTime():'')+(Params.endTime?timeObj.endTime():'')
+    timeStr=(Params.startTime?timeObj.createTime():'')+(Params.endTime?timeObj.endTime():'')
     `
     // 查询总条数
     let queryTotalSql =
@@ -311,14 +315,25 @@ export class CreateCustomFun {
 
   }
   checkToken() {
-    return `
+    let checkStr = `
     try {
       var redisRes = JSON.parse(CustomizeUtil.redisGet({ key: Params.token }))
       if (!redisRes.data.value) {
         JsResult.result = createRes('00008', 'token过期或token不能为空')
         return
       }
-      Params.phone = JSON.parse(redisRes.data.value).userphone
+      var resData = JSON.parse(redisRes.data.value)
+      Params.phone = resData.userphone
+      `
+    if (this.isBackground) {
+      checkStr += `
+      if(!resData.adminUser){
+      JsResult.result = createRes('00005', '该手机号码无权限登录')
+      return
+      }
+      `
+    }
+    return checkStr += `
     } catch (error) {
       return JsResult.result = createRes('00008', 'token过期或token不能为空')
     }
@@ -359,7 +374,8 @@ export class CreateCustomFun {
       return (JsResult.result = createRes('00002', '请输入手机号和验证码'))
     }
     var userInfo = {
-      userphone: phone
+      userphone: phone,
+      adminUser:1
     }
     var userDetailSql =
       'select * from ${this.tableName} where status=1 and phone=' + phone
@@ -538,13 +554,14 @@ export class CreateCustomFun {
     )
   }
   commonHead() {
-    return `
+    let commonStr = `
     function executeFuntion() {
       function createRes(code, retMsg,other) {
         return JSON.stringify({
           data: { retCode: code, retMsg: retMsg, other: other ? other : '' }
         })
     }`
+    return commonStr
   }
   commonFooter() {
     return `}
