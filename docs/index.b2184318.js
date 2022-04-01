@@ -100,7 +100,7 @@ var orgResult = CustomizeUtil.abilitySql(delSql, Params)
     var timeStr=''
     var timeObj = {
       startTime: function () { return ' and createTime >= #{startTime}'},
-      endTime: function () { return ' and createTime =< #{endTime}'}
+      endTime: function () { return ' and createTime <= #{endTime}'}
     }
     timeStr=(Params.startTime?timeObj.createTime():'')+(Params.endTime?timeObj.endTime():'')
     `;let r='var queryTotalSql = "select id from '+this.tableName+' where status = 1"',l='var queryDataSql= "select * from '+this.tableName+' where status = 1"',d="";e.map(m=>{d+=`+(Params['${m}']?" and ${m} = #{${m}}":"")`}),u.map(m=>{d+=`+(Params['${m}']?(" and ${m} like '%"+Params['${m}']+"%'"):"")`}),r+=d+'+timeStr+" order by createTime desc"',l+=d+'+timeStr+" order by createTime desc limit "+limitSize+", "+ limit';const i=`
