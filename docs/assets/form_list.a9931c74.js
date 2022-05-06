@@ -1,0 +1,1 @@
+import{h as e}from"./index.90881ba4.js";function i(t){return e.request({url:"activity/bus/sheet/find/page",method:"POST",params:t})}function u(t){return e.request({url:"activity/bus/sheet/delete",method:"POST",params:t})}function s(t){return e.request({url:"activity/activity/sheet/get",method:"POST",params:t})}export{u as d,i as f,s as g};

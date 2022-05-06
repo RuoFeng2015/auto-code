@@ -1,0 +1,1 @@
+window.__PRODUCTION__云开发平台__CONF__={"VITE_GLOB_APP_TITLE":"云开发平台","VITE_GLOB_APP_SHORT_NAME":"云开发平台","VITE_GLOB_PROD_MOCK":"true","VITE_GLOB_API_URL":"","VITE_GLOB_UPLOAD_URL":"","VITE_GLOB_IMG_URL":"","VITE_GLOB_API_URL_PREFIX":""};Object.freeze(window.__PRODUCTION__云开发平台__CONF__);Object.defineProperty(window,"__PRODUCTION__云开发平台__CONF__",{configurable:false,writable:false,});
