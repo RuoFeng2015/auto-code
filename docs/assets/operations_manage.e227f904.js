@@ -1,1 +1,0 @@
-import{_ as o}from"./index.f8f7641c.js";import{T as t,o as r,c,V as a}from"./vendor.ad09d2ba.js";const n={},s={class:"activity_profile"};function _(i,m){const e=t("RouterView");return r(),c("div",s,[a(e)])}var l=o(n,[["render",_]]);export{l as default};
