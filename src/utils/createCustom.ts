@@ -125,7 +125,7 @@ export class CreateCustomFun {
     var nArr= ${JSON.stringify(noEmptyArr)}\n
     for (var i = 0; i <nArr.length; i++) {
       if (!Params[nArr[i]]) {
-        return  JsResult.result=createRes('00007', nArr[i] + '不能为空')
+        return  JsResult.result = createRes('00007', nArr[i] + '不能为空')
       }
     }`
     for (let i = 0; i < addArr.length; i++) {
@@ -249,7 +249,7 @@ export class CreateCustomFun {
     var nArr= ${JSON.stringify(noEmptyArr)}\n
     for (var i = 0; i <nArr.length; i++) {
       if (!Params[nArr[i]]) {
-        return createRes('00007', nArr[i] + '不能为空')
+        return JsResult.result = createRes('00007', nArr[i] + '不能为空')
       }
     }`
     for (let i = 0; i < updateArr.length; i++) {
